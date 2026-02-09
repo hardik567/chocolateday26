@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Happy Chocolate Day! 🍫</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Dancing+Script:wght@700&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle, #5d4037 0%, #3e2723 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        /* The Foil Wrapper Effect */
+        .wrapper {
+            position: relative;
+            background: #c0c0c0; /* Silver foil */
+            padding: 10px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background-image: linear-gradient(135deg, #e0e0e0 25%, #c0c0c0 25%, #c0c0c0 50%, #e0e0e0 50%, #e0e0e0 75%, #c0c0c0 75%, #c0c0c0 100%);
+            background-size: 20px 20px;
+        }
+
+        /* The Chocolate Bar Container */
+        .chocolate-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 Columns */
+            gap: 10px;
+            background: #3e2723;
+            padding: 15px;
+            border-radius: 10px;
+            border: 5px solid #281813;
+        }
+
+        /* Individual Chocolate Square */
+        .square {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(145deg, #5d4037, #3e2723);
+            border-radius: 8px;
+            box-shadow:  5px 5px 10px #201412, 
+                        -5px -5px 10px #5c3a34;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.1s;
+            text-align: center;
+            font-size: 11px; /* Font size for messages */
+            color: #fff;
+            padding: 5px;
+            box-sizing: border-box;
+            user-select: none;
+            line-height: 1.2;
+        }
+
+        .square:active {
+            transform: scale(0.95);
+        }
+
+        /* Design on top of the chocolate block */
+        .square::before {
+            content: '❤️';
+            font-size: 24px;
+            opacity: 0.3;
+            position: absolute;
+            transition: opacity 0.3s;
+        }
+
+        /* REVEALED STATE (When clicked) */
+        .square.revealed {
+            background: #fff3e0; /* Creamy inside */
+            box-shadow: inset 3px 3px 5px rgba(0,0,0,0.2);
+            color: #5d4037; /* Brown text */
+            font-weight: 600;
+            transform: none;
+            cursor: default;
+        }
+
+        .square.revealed::before {
+            opacity: 0; /* Hide the top heart design */
+        }
+
+        /* BOMB STYLE */
+        .square.bomb {
+            background: #ef5350; /* Red alert */
+            color: white;
+            font-size: 24px;
+        }
+
+        /* Header Text */
+        h1 {
+            color: #fff;
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .instruction {
+            color: #e0e0e0;
+            font-size: 0.9rem;
+            margin-top: 15px;
+            opacity: 0.8;
+        }
+
+        /* Popup Modal for Bomb/Win */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            text-align: center;
+            z-index: 100;
+            width: 80%;
+            max-width: 300px;
+            animation: popIn 0.3s ease;
+        }
+
+        .modal h2 {
+            color: #d32f2f;
+            font-family: 'Dancing Script', cursive;
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        .modal p {
+            color: #555;
+            margin: 10px 0 20px 0;
+            font-size: 1.1rem;
+        }
+
+        .modal button {
+            background: #3e2723;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        /* Overlay to darken background */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 99;
+        }
+
+        @keyframes popIn {
+            from { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Happy Chocolate Day! 🍫</h1>
+
+    <div class="wrapper">
+        <div class="chocolate-bar" id="grid">
+            </div>
+    </div>
+
+    <div class="instruction">Tap a square... watch out for bombs! 💥</div>
+
+    <div class="overlay" id="overlay"></div>
+    <div class="modal" id="modal">
+        <h2 id="modal-title">BOOM! 💥</h2>
+        <p id="modal-msg">You found the hidden truffle!</p>
+        <button onclick="closeModal()">Okay! ❤️</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        const grid = document.getElementById('grid');
+        const modal = document.getElementById('modal');
+        const overlay = document.getElementById('overlay');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMsg = document.getElementById('modal-msg');
+
+        // --- GAME CONFIGURATION ---
+        const rows = 4;
+        const cols = 3;
+        const totalSquares = rows * cols; // 12 Squares
+        const bombCount = 5; // UPDATED: 5 Bombs!
+
+        // Messages for Safe Squares (Lovable)
+        const messages = [
+            "Sweetest Girl ❤️",
+            "My Flavor is You",
+            "I Love You! 🍫",
+            "Best GF Ever",
+            "Hugs & Kisses",
+            "You + Me = 🍬",
+            "My Cutie Pie",
+            "Tasty! 😋",
+            "Forever Yours",
+            "So Yummy!"
+        ];
+
+        // Messages for Bombs (Penalties)
+        const bombMessages = [
+            "💥 BOOM! Give me a KISS now!",
+            "💣 EXPLOSION! Send a heart selfie!",
+            "💥 BOOM! Say 'I love you' 3 times!",
+            "💣 CAUGHT! You owe me a chocolate!",
+            "💥 BANG! Hug me tightly!"
+        ];
+
+        let gameArray = [];
+
+        // 1. Generate Game Board
+        function createBoard() {
+            gameArray = []; // Reset array
+            
+            // Fill array with 'safe' initially
+            for(let i=0; i<totalSquares; i++) {
+                gameArray.push('safe');
+            }
+            
+            // Randomly place bombs
+            let placedBombs = 0;
+            while (placedBombs < bombCount) {
+                let r = Math.floor(Math.random() * totalSquares);
+                if (gameArray[r] === 'safe') {
+                    gameArray[r] = 'bomb';
+                    placedBombs++;
+                }
+            }
+
+            // Render HTML
+            grid.innerHTML = ''; // Clear previous grid
+            for (let i = 0; i < totalSquares; i++) {
+                const square = document.createElement('div');
+                square.classList.add('square');
+                square.setAttribute('data-id', i);
+                
+                // Add click event
+                square.addEventListener('click', function() {
+                    clickSquare(square, gameArray[i]);
+                });
+                
+                grid.appendChild(square);
+            }
+        }
+
+        // 2. Click Logic
+        function clickSquare(square, type) {
+            if (square.classList.contains('revealed')) return; // Already clicked
+
+            square.classList.add('revealed');
+
+            if (type === 'safe') {
+                // Pick a random sweet message
+                const msg = messages[Math.floor(Math.random() * messages.length)];
+                square.innerText = msg;
+                
+                // Small confetti pop
+                confetti({
+                    particleCount: 15,
+                    spread: 40,
+                    origin: { y: 0.6 },
+                    colors: ['#5d4037', '#8d6e63', '#fff'],
+                    disableForReducedMotion: true
+                });
+
+            } else if (type === 'bomb') {
+                // Bomb Logic
+                square.classList.add('bomb');
+                square.innerText = "💥";
+                
+                // Shake screen
+                document.body.style.animation = "shake 0.5s";
+                
+                // Remove animation class after it runs so it can run again
+                setTimeout(() => {
+                    document.body.style.animation = "";
+                }, 500);
+
+                // Show Penalty Modal
+                const penalty = bombMessages[Math.floor(Math.random() * bombMessages.length)];
+                showModal("Caught You!", penalty);
+            }
+        }
+
+        // Modal Functions
+        function showModal(title, msg) {
+            setTimeout(() => {
+                modalTitle.innerText = title;
+                modalMsg.innerText = msg;
+                overlay.style.display = 'block';
+                modal.style.display = 'block';
+            }, 400); // Slight delay for effect
+        }
+
+        function closeModal() {
+            overlay.style.display = 'none';
+            modal.style.display = 'none';
+        }
+
+        // Start the game
+        createBoard();
+
+    </script>
+</body>
+</html>
